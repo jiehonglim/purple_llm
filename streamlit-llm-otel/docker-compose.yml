@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  streamlit-app:
+    build: .
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./src:/app/src
+    environment:
+      - OTEL_SERVICE_NAME=streamlit-llm-otel
+      - OTEL_EXPORTER=otlp
+      - OTEL_TRACES_EXPORTER=otlp
+      - OTEL_METRICS_EXPORTER=otlp
+      - OTEL_COLLECTOR_ENDPOINT=otel-collector:4317
+    depends_on:
+      - otel-collector
+
+  otel-collector:
+    image: otel/opentelemetry-collector:latest
+    volumes:
+      - ./otel-collector-config.yml:/otel-collector-config.yml
+    command: ["--config", "/otel-collector-config.yml"]
+    ports:
+      - "4317:4317"  # OTLP gRPC
+      - "55681:55681"  # OTLP HTTP

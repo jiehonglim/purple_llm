@@ -1,0 +1,22 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+exporters:
+  logging:
+    logLevel: debug
+  otlp:
+    endpoint: "your-otel-collector-endpoint:4317"
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [logging, otlp]
+    metrics:
+      receivers: [otlp]
+      exporters: [logging, otlp]
